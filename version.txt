@@ -1,0 +1,2 @@
+5.3
+https://github.com/YourUsername/KnoxWizard-Updates/releases/download/v5.3/KnoxWizard.exe
