@@ -1,2 +1,2 @@
-5.7
+5.5
 https://github.com/lonyibe/xtech/releases/download/v5.3/KnoxWizard_Final.exe
