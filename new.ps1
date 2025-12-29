@@ -259,7 +259,7 @@ namespace KnoxWizardApp {
         public static Color BackgroundGrad = Color.FromArgb(240, 248, 255); 
         public static Color InputBg = Color.FromArgb(245, 247, 250);  
         public static Color TextDark = Color.FromArgb(64, 64, 64);    
-        public static Color TextLight = Color.Gray;                   
+        public static Color TextLight = Color.Gray;                    
         public static Color StopRed = Color.FromArgb(220, 53, 69);    
     }
 
@@ -526,8 +526,8 @@ namespace KnoxWizardApp {
 
         private Panel pnlViewPatch, pnlViewSpdMtk, pnlViewSamsung, pnlViewZte, pnlViewHmd, pnlViewMtp, pnlViewAdb, pnlViewFastboot;
         
-        private Label lblFile1, lblFile2;
-        private KnoxButton btnPatchStandard, btnPatchSuper;
+        private Label lblFile1, lblFile2, lblFile3;
+        private KnoxButton btnPatchStandard, btnPatchSuper, btnPatchUniversal;
         private ProgressBar progBarSuper;
         private KnoxButton btnSpd2025, btnAnonyShu, btnBlackScreen, btnAutoReset, btnAdb;
         private KnoxButton btnSamsungBypass, btnMtp, btnFastboot;
@@ -536,16 +536,17 @@ namespace KnoxWizardApp {
 
         private string currentFilePathStandard = "";
         private string currentFilePathSuper = "";
+        private string currentFilePathUniversal = "";
         private bool isMonitoring = true;
         private volatile string _cachedDeviceStatus = "none";
         private volatile bool _stopRequested = false;
 
         private string FP_HEX = "5B 92 8D EC EB 97 78 57 AF C2 58 CD 53 E6 A8 D2"; 
         private string SEC_HEX = "53 65 63 75 72 69 74 79 43 6F 6D 2E 61 70 6B"; 
-        private string PCS_HEX = "50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65 73 2E 6F 64 65 78 50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65 73 2E 76 64 65 78";
+        private string PCS_HEX = "50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65 2E 6F 64 65 78 50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65 2E 76 64 65 78";
         private string SEC_ODEX_HEX = "53 65 63 75 72 69 74 79 43 6F 6D 2E 6F 64 65 78 53 65 63 75 72 69 74 79 43 6F 6D 2E 76 64 65 78";
-        private string PCS_APKOAT_HEX = "50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65 73 2E 61 70 6B 6F 61 74";
-        private string PRIV_APP_HEX = "70 72 69 76 2D 61 70 70 2F 50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65 73";
+        private string PCS_APKOAT_HEX = "50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65 2E 61 70 6B 6F 61 74";
+        private string PRIV_APP_HEX = "70 72 69 76 2D 61 70 70 2F 50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65";
         private string PROD_SEC_HEX = "2F 70 72 6F 64 75 63 74 2F 70 72 69 76 2D 61 70 70 2F 53 65 63 75 72 69 74 79 43 6F 6D";
         private string YYYY_MARKER = "FF FF FF FF";
         private string FP_START = "PK";
@@ -710,7 +711,7 @@ namespace KnoxWizardApp {
             
             grpMisc.Controls.Add(lblFile1); grpMisc.Controls.Add(btnPatchStandard);
 
-            KnoxGroupPanel grpSuper = new KnoxGroupPanel { Title = " Super.img Patch ", Location = new Point(20, 150), Size = new Size(400, 150) };
+            KnoxGroupPanel grpSuper = new KnoxGroupPanel { Title = " Super.img Patch ", Location = new Point(20, 140), Size = new Size(400, 150) };
             
             lblFile2 = new Label { Text = "No File Loaded", Location = new Point(15, 60), Size = new Size(220, 20), ForeColor = AppTheme.TextLight };
             btnPatchSuper = new KnoxButton { Text = "LOAD SUPER", Location = new Point(240, 55), Size = new Size(140, 35) }; btnPatchSuper.Click += BtnPatchSuper_Click;
@@ -718,7 +719,37 @@ namespace KnoxWizardApp {
             progBarSuper = new ProgressBar { Location = new Point(15, 110), Size = new Size(370, 10) };
             grpSuper.Controls.Add(lblFile2); grpSuper.Controls.Add(btnPatchSuper); grpSuper.Controls.Add(progBarSuper);
             
-            pnlViewPatch.Controls.Add(grpMisc); pnlViewPatch.Controls.Add(grpSuper); pnlLeftPane.Controls.Add(pnlViewPatch);
+            // --- NEW: UNIVERSAL PATCH (MTK/SPD) ---
+            KnoxGroupPanel grpUniversal = new KnoxGroupPanel { Title = " Universal Patch (MTK/SPD) ", Location = new Point(20, 310), Size = new Size(400, 120) };
+            
+            lblFile3 = new Label { Text = "No File Loaded", Location = new Point(15, 60), Size = new Size(220, 20), ForeColor = AppTheme.TextLight };
+            btnPatchUniversal = new KnoxButton { Text = "LOAD UNIVERSAL", Location = new Point(240, 55), Size = new Size(140, 35) }; 
+            btnPatchUniversal.Click += BtnPatchUniversal_Click;
+
+            grpUniversal.Controls.Add(lblFile3); grpUniversal.Controls.Add(btnPatchUniversal);
+
+            pnlViewPatch.Controls.Add(grpMisc); pnlViewPatch.Controls.Add(grpSuper); pnlViewPatch.Controls.Add(grpUniversal);
+            pnlLeftPane.Controls.Add(pnlViewPatch);
+        }
+
+        private async void BtnPatchUniversal_Click(object sender, EventArgs e) {
+            OpenFileDialog dlg = new OpenFileDialog { Filter = "System Files|*.img;*.bin|All Files|*.*" };
+            if (dlg.ShowDialog() != DialogResult.OK) return;
+            currentFilePathUniversal = dlg.FileName; lblFile3.Text = Path.GetFileName(currentFilePathUniversal);
+            
+            Log("Universal Patch File Loaded: " + currentFilePathUniversal, Color.Black);
+            btnPatchUniversal.Enabled = false;
+
+            UniversalPatcher patcher = new UniversalPatcher();
+            Log("Starting Universal MTK/SPD Algorithm...", AppTheme.Primary);
+            
+            // Redirect console output is not easy in WinForms without pipes, so we rely on Task result
+            await patcher.ExecuteUniversalPatch(currentFilePathUniversal);
+            
+            Log("Universal Patch Completed (Check backup file).", Color.Green);
+            using (KnoxPopup p = new KnoxPopup("Universal Patch Finished!")) { p.ShowDialog(this); }
+            
+            btnPatchUniversal.Enabled = true;
         }
 
         private void InitializeSpdMtkView() {
@@ -1240,6 +1271,345 @@ namespace KnoxWizardApp {
             Application.Run(login);
             if (login.IsAuthenticated) { Application.Run(new KnoxMain()); }
         }
+    }
+
+    public class UniversalPatcher
+    {
+        // --- TARGETS ---
+        private const string MTK_FP_HEX = "63 6C 61 73 73 65 73 2E 64 65 78 64 65 78"; 
+        private const string FP_START = "PK";
+        private const string FP_END = "META-INF/MANIFEST.MFPK";
+
+        private const string SEC_HEX = "53 65 63 75 72 69 74 79 43 6F 6D 2E 61 70 6B"; 
+        private const string MTK_PCS_HEX = "50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65 53 65 63 75 72 69 74 79 43 6F 6D";
+        private const string PCS_HEX = "50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65 2E 6F 64 65 78 50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65 2E 76 64 65 78";
+
+        // SCORPIO TARGETS
+        private const string SCORPIO_INIT = "69 6E 69 74 69 61 6C 2D 70 61 63 6B 61 67 65 2D 73 74 61 74 65 20 70 61 63 6B 61 67 65 3D 22 63 6F 6D 2E 73 63 6F 72 70 69 6F 2E 73 65 63 75 72 69 74 79 63 6F 6D";
+        private const string SCORPIO_PATH = "70 72 6F 64 75 63 74 2F 70 72 69 76 2D 61 70 70 2F 53 65 63 75 72 69 74 79 43 6F 6D";
+        private const string SCORPIO_XML  = "78 6D 6C 63 6F 6D 2E 73 63 6F 72 70 69 6F 2E 73 65 63 75 72 69 74 79 63 6F 6D";
+        private const string SCORPIO_PERM = "3C 70 72 69 76 61 70 70 2D 70 65 72 6D 69 73 73 69 6F 6E 73 20 70 61 63 6B 61 67 65 3D 22 63 6F 6D 2E 73 63 6F 72 70 69 6F 2E 73 65 63 75 72 69 74 79 63 6F 6D 22 3E";
+        private const string SCORPIO_ODEX = "73 65 63 75 72 69 74 79 63 6F 6D 2E 6F 64 65 78";
+
+        private const string SEC_ODEX_HEX = "53 65 63 75 72 69 74 79 43 6F 6D 2E 6F 64 65 78 53 65 63 75 72 69 74 79 43 6F 6D 2E 76 64 65 78";
+        private const string PCS_APKOAT_HEX = "50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65 2E 61 70 6B 6F 61 74";
+        private const string PRIV_APP_HEX = "70 72 69 76 2D 61 70 70 2F 50 72 69 76 61 74 65 43 6F 6D 70 75 74 65 53 65 72 76 69 63 65";
+        private const string PROD_SEC_HEX = "2F 70 72 6F 64 75 63 74 2F 70 72 69 76 2D 61 70 70 2F 53 65 63 75 72 69 74 79 43 6F 6D";
+
+        private const string YYYY_MARKER = "FF FF FF FF";
+        private const string YYYY_ALT_MARKER = "FF F7 FF FF";
+        
+        // LIMITS
+        private const int MTK_MAX_PK_DIST = 160;
+        private const int FORWARD_SCAN_LIMIT = 4096; // Kept only for forward safety
+
+        public async Task ExecuteUniversalPatch(string targetPath)
+        {
+            if (string.IsNullOrEmpty(targetPath) || !File.Exists(targetPath)) return;
+
+            await Task.Run(() =>
+            {
+                try
+                {
+                    string backup = targetPath + ".bak";
+                    if (!File.Exists(backup)) File.Copy(targetPath, backup);
+
+                    using (FileStream fs = new FileStream(targetPath, FileMode.Open, FileAccess.ReadWrite))
+                    {
+                        // STAGE 1-5 (Standard Strict Operations)
+                        PerformStrictFingerprintWipe(fs, MTK_FP_HEX);
+                        PerformStrictBlockWipe(fs, SEC_HEX);
+                        PerformMtkCustomWipe(fs, MTK_PCS_HEX); // Updated logic applied here
+                        PerformStrictBlockWipe(fs, PCS_HEX);
+                        PerformStrictBlockWipe(fs, SEC_ODEX_HEX);
+                        PerformStrictBlockWipe(fs, PCS_APKOAT_HEX);
+                        PerformPrivAppGapWipe(fs);
+                        PerformProdSecWipe(fs);
+
+                        // STAGE 6: SCORPIO SUITE (Updated Logic)
+                        PerformMtkCustomWipe(fs, SCORPIO_INIT);
+                        PerformMtkCustomWipe(fs, SCORPIO_PATH);
+                        PerformMtkCustomWipe(fs, SCORPIO_XML);
+                        PerformMtkCustomWipe(fs, SCORPIO_PERM);
+                        PerformMtkCustomWipe(fs, SCORPIO_ODEX);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message);
+                }
+            });
+        }
+
+        // --- NEW CUSTOM ALGORITHM (Replaces 4KB Logic) ---
+        private bool PerformMtkCustomWipe(FileStream fs, string hexTarget)
+        {
+            byte[] target = HexStringToBytes(hexTarget);
+            
+            // Standard Markers
+            byte[] m1 = HexStringToBytes("FF FF FF FF");
+            byte[] m2 = HexStringToBytes("FF F7 FF FF");
+            
+            // Complex Cluster Markers
+            byte[] c1 = HexStringToBytes("FF FF F7 FF"); 
+            byte[] c2 = HexStringToBytes("FF FF FF F7");
+
+            long currentPos = 0; bool found = false;
+
+            while (currentPos < fs.Length)
+            {
+                long matchPos = FindFirstOccurrence(fs, target, currentPos);
+                if (matchPos == -1) break;
+                found = true;
+
+                // 1. BACKWARD SEARCH (Unbounded / "Closest")
+                long bestBackPos = -1;
+                
+                // Scan backward byte-by-byte from matchPos
+                long searchPointer = matchPos - 4; // Start looking immediately before target
+                
+                while (searchPointer >= 0)
+                {
+                    fs.Position = searchPointer;
+                    byte[] buffer = new byte[4];
+                    int read = fs.Read(buffer, 0, 4);
+                    if (read < 4) break;
+
+                    // Check Standard Markers
+                    if (IsBytesEqual(buffer, m1) || IsBytesEqual(buffer, m2))
+                    {
+                        bestBackPos = searchPointer;
+                        break; // Found closest!
+                    }
+
+                    // Check Complex Markers (>2 immediate incidents, i.e., 3 contiguous blocks)
+                    // Check if current block is c1 or c2
+                    if (IsBytesEqual(buffer, c1))
+                    {
+                        // Look back for 2 more immediate incidents (Total 3)
+                        if (CheckImmediatePrevious(fs, searchPointer, c1, 2)) 
+                        {
+                            bestBackPos = searchPointer;
+                            break; 
+                        }
+                    }
+                    if (IsBytesEqual(buffer, c2))
+                    {
+                        // Look back for 2 more immediate incidents
+                        if (CheckImmediatePrevious(fs, searchPointer, c2, 2))
+                        {
+                            bestBackPos = searchPointer;
+                            break;
+                        }
+                    }
+
+                    searchPointer--; // Move back 1 byte and retry (exhaustive scan)
+                }
+
+                if (bestBackPos != -1)
+                {
+                    // 2. APPLY 4 DOT RULE
+                    // Wipe starts 8 bytes after the marker start (4 bytes marker + 4 bytes dots)
+                    long wipeStart = bestBackPos + 4 + 4;
+
+                    // 3. FORWARD SCAN (Normal Logic)
+                    // We keep a reasonable limit forward so we don't wipe the whole file if end marker is missing
+                    long fwdSearchLimit = wipeStart + FORWARD_SCAN_LIMIT;
+                    if (fwdSearchLimit > fs.Length) fwdSearchLimit = fs.Length;
+
+                    long fwd1 = FindFirstOccurrenceInRange(fs, m1, wipeStart, fwdSearchLimit);
+                    long fwd2 = FindFirstOccurrenceInRange(fs, m2, wipeStart, fwdSearchLimit);
+
+                    long wipeEnd = -1;
+                    if (fwd1 != -1 && fwd2 != -1) wipeEnd = Math.Min(fwd1, fwd2);
+                    else if (fwd1 != -1) wipeEnd = fwd1;
+                    else if (fwd2 != -1) wipeEnd = fwd2;
+
+                    if (wipeEnd != -1 && wipeEnd > wipeStart)
+                    {
+                        long wipeLength = wipeEnd - wipeStart;
+                        fs.Position = wipeStart;
+                        fs.Write(new byte[wipeLength], 0, (int)wipeLength);
+                    }
+                }
+                currentPos = matchPos + target.Length;
+            }
+            return found;
+        }
+
+        // Helper to check for "Immediate Previous" incidents
+        // Checks if 'pattern' appears 'count' times immediately before 'currentPos'
+        private bool CheckImmediatePrevious(FileStream fs, long currentPos, byte[] pattern, int count)
+        {
+            long checkPos = currentPos;
+            byte[] buf = new byte[4];
+            
+            for(int i = 0; i < count; i++)
+            {
+                checkPos -= 4; // Move back 4 bytes (immediate previous block)
+                if (checkPos < 0) return false;
+                
+                fs.Position = checkPos;
+                fs.Read(buf, 0, 4);
+                if (!IsBytesEqual(buf, pattern)) return false;
+            }
+            return true;
+        }
+
+        private bool IsBytesEqual(byte[] a, byte[] b)
+        {
+            if (a.Length != b.Length) return false;
+            for (int i = 0; i < a.Length; i++) if (a[i] != b[i]) return false;
+            return true;
+        }
+
+        // --- EXISTING UTILS ---
+        private bool PerformStrictFingerprintWipe(FileStream fs, string hexSignature) {
+            byte[] fingerprint = HexStringToBytes(hexSignature);
+            byte[] startMark = Encoding.UTF8.GetBytes(FP_START);
+            byte[] endMark = Encoding.UTF8.GetBytes(FP_END);
+            long currentPos = 0; bool wipeOccurred = false;
+            while(currentPos < fs.Length) {
+                long matchPos = FindFirstOccurrence(fs, fingerprint, currentPos);
+                if (matchPos == -1) break;
+                long searchBackLimit1 = Math.Max(0, matchPos - (1024 * 1024 * 5));
+                long firstPK = FindLastOccurrenceInRange(fs, startMark, searchBackLimit1, matchPos);
+                if (firstPK != -1) {
+                    long searchBackLimit2 = Math.Max(0, firstPK - (1024 * 1024 * 5));
+                    long secondPK = FindLastOccurrenceInRange(fs, startMark, searchBackLimit2, firstPK - 1);
+                    long finalStartPos = -1;
+                    if (secondPK == -1) { currentPos = matchPos + fingerprint.Length; continue; }
+                    else {
+                        long dist = firstPK - secondPK;
+                        if (dist > MTK_MAX_PK_DIST) { currentPos = matchPos + fingerprint.Length; continue; }
+                        if (IsLinePrefixClean(fs, secondPK)) finalStartPos = secondPK;
+                        else { currentPos = matchPos + fingerprint.Length; continue; }
+                    }
+                    if (finalStartPos != -1) {
+                        long endPos = FindFirstOccurrence(fs, endMark, matchPos);
+                        if (endPos != -1) {
+                            long wipeLength = (endPos + endMark.Length) - finalStartPos;
+                            fs.Position = finalStartPos;
+                            fs.Write(new byte[wipeLength], 0, (int)wipeLength);
+                            wipeOccurred = true;
+                            currentPos = endPos + endMark.Length; continue;
+                        }
+                    }
+                }
+                currentPos = matchPos + fingerprint.Length;
+            }
+            return wipeOccurred;
+        }
+
+        private bool PerformStrictBlockWipe(FileStream fs, string hexTarget) {
+            byte[] target = HexStringToBytes(hexTarget);
+            byte[] marker = HexStringToBytes(YYYY_MARKER);
+            long currentPos = 0; bool found = false;
+            while (currentPos < fs.Length) {
+                long matchPos = FindFirstOccurrence(fs, target, currentPos);
+                if (matchPos == -1) break;
+                found = true;
+                long searchBackLimit = Math.Max(0, matchPos - (1024 * 1024));
+                long topMarkerPos = FindLastOccurrenceInRange(fs, marker, searchBackLimit, matchPos);
+                if (topMarkerPos != -1) {
+                    long rowStart = topMarkerPos - (topMarkerPos % 16);
+                    long eraseStart = rowStart + 16;
+                    long bottomMarkerPos = FindFirstOccurrence(fs, marker, matchPos + target.Length);
+                    if (bottomMarkerPos != -1) {
+                        long eraseEnd = bottomMarkerPos - (bottomMarkerPos % 16);
+                        if (eraseEnd > eraseStart) {
+                            long wipeLength = eraseEnd - eraseStart;
+                            fs.Position = eraseStart;
+                            fs.Write(new byte[wipeLength], 0, (int)wipeLength);
+                            currentPos = bottomMarkerPos + 16; continue;
+                        }
+                    }
+                }
+                currentPos = matchPos + target.Length;
+            }
+            return found;
+        }
+
+        private bool PerformPrivAppGapWipe(FileStream fs) {
+            byte[] target = HexStringToBytes(PRIV_APP_HEX);
+            byte[] marker = HexStringToBytes(YYYY_MARKER);
+            long currentPos = 0; bool found = false;
+            while (currentPos < fs.Length) {
+                long matchPos = FindFirstOccurrence(fs, target, currentPos);
+                if (matchPos == -1) break;
+                found = true;
+                long searchBackLimit = Math.Max(0, matchPos - (1024 * 1024));
+                long topMarkerStart = FindLastOccurrenceInRange(fs, marker, searchBackLimit, matchPos);
+                if (topMarkerStart != -1) {
+                    fs.Position = topMarkerStart; int b; long trueEndOfFFs = topMarkerStart;
+                    while ((b = fs.ReadByte()) != -1) { if (b != 0xFF) { trueEndOfFFs = fs.Position - 1; break; } }
+                    long eraseStart = trueEndOfFFs + 3;
+                    long bottomMarkerPos = FindFirstOccurrence(fs, marker, matchPos + target.Length);
+                    if (bottomMarkerPos != -1) {
+                        long eraseEnd = bottomMarkerPos - (bottomMarkerPos % 16);
+                        if (eraseEnd > eraseStart) {
+                            long wipeLength = eraseEnd - eraseStart;
+                            fs.Position = eraseStart; fs.Write(new byte[wipeLength], 0, (int)wipeLength);
+                            currentPos = bottomMarkerPos + 4; continue;
+                        }
+                    }
+                }
+                currentPos = matchPos + target.Length;
+            }
+            return found;
+        }
+
+        private bool PerformProdSecWipe(FileStream fs) {
+            byte[] target = HexStringToBytes(PROD_SEC_HEX);
+            byte[] marker = HexStringToBytes(YYYY_MARKER);
+            long currentPos = 0; bool found = false;
+            while (currentPos < fs.Length) {
+                long matchPos = FindFirstOccurrence(fs, target, currentPos);
+                if (matchPos == -1) break;
+                found = true;
+                long searchBackLimit = Math.Max(0, matchPos - (1024 * 1024));
+                long topMarkerStart = FindLastOccurrenceInRange(fs, marker, searchBackLimit, matchPos);
+                if (topMarkerStart != -1) {
+                    fs.Position = topMarkerStart; int b; long trueEndOfFFs = topMarkerStart;
+                    while ((b = fs.ReadByte()) != -1) { if (b != 0xFF) { trueEndOfFFs = fs.Position - 1; break; } }
+                    long eraseStart = trueEndOfFFs + 6;
+                    long bottomMarkerPos = FindFirstOccurrence(fs, marker, matchPos + target.Length);
+                    if (bottomMarkerPos != -1) {
+                        long eraseEnd = bottomMarkerPos - 3;
+                        if (eraseEnd > eraseStart) {
+                            long wipeLength = eraseEnd - eraseStart;
+                            fs.Position = eraseStart; fs.Write(new byte[wipeLength], 0, (int)wipeLength);
+                            currentPos = bottomMarkerPos + 4; continue;
+                        }
+                    }
+                }
+                currentPos = matchPos + target.Length;
+            }
+            return found;
+        }
+
+        private bool IsLinePrefixClean(FileStream fs, long pos) {
+            long rowStart = pos - (pos % 16);
+            int lengthToCheck = (int)(pos - rowStart);
+            if (lengthToCheck == 0) return true;
+            long originalPos = fs.Position;
+            fs.Position = rowStart;
+            byte[] prefixBuffer = new byte[lengthToCheck];
+            fs.Read(prefixBuffer, 0, lengthToCheck);
+            fs.Position = originalPos;
+            foreach (byte b in prefixBuffer) { if (b != 0x00) return false; }
+            return true;
+        }
+
+        private byte[] HexStringToBytes(string hex) { hex = hex.Replace(" ", ""); return Enumerable.Range(0, hex.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(hex.Substring(x, 2), 16)).ToArray(); }
+        
+        private long FindFirstOccurrence(FileStream fs, byte[] pattern, long startOffset) { int bufferSize = 1024 * 1024; byte[] buffer = new byte[bufferSize]; fs.Position = startOffset; int bytesRead; while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) > 0) { for (int i = 0; i <= bytesRead - pattern.Length; i++) { if (IsMatch(buffer, i, pattern)) return (fs.Position - bytesRead) + i; } if (fs.Position < fs.Length) fs.Position -= pattern.Length; } return -1; }
+        
+        private long FindFirstOccurrenceInRange(FileStream fs, byte[] pattern, long startOffset, long endLimit) { int bufferSize = 1024 * 1024; byte[] buffer = new byte[bufferSize]; fs.Position = startOffset; long totalToRead = endLimit - startOffset; long processed = 0; while (processed < totalToRead) { int toRead = (int)Math.Min(bufferSize, totalToRead - processed); int bytesRead = fs.Read(buffer, 0, toRead); if(bytesRead == 0) break; for (int i = 0; i <= bytesRead - pattern.Length; i++) { if (IsMatch(buffer, i, pattern)) return (fs.Position - bytesRead) + i; } processed += bytesRead; if (processed < totalToRead) { fs.Position -= pattern.Length; processed -= pattern.Length; } } return -1; }
+        
+        private long FindLastOccurrenceInRange(FileStream fs, byte[] pattern, long startLimit, long endLimit) { long bestPos = -1; fs.Position = startLimit; int bufferSize = 1024 * 1024; byte[] buffer = new byte[bufferSize]; long totalToRead = endLimit - startLimit; long processed = 0; while (processed < totalToRead) { int toRead = (int)Math.Min(bufferSize, totalToRead - processed); int bytesRead = fs.Read(buffer, 0, toRead); if (bytesRead == 0) break; for (int i = 0; i <= bytesRead - pattern.Length; i++) { if (IsMatch(buffer, i, pattern)) bestPos = (fs.Position - bytesRead) + i; } processed += bytesRead; if (processed < totalToRead) { fs.Position -= pattern.Length; processed -= pattern.Length; } } return bestPos; }
+        
+        private bool IsMatch(byte[] buffer, int offset, byte[] pattern) { for (int j = 0; j < pattern.Length; j++) { if (buffer[offset + j] != pattern[j]) return false; } return true; }
     }
 }
 "@
